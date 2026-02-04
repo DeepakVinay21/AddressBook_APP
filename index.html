@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Modern mobile contact management app">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Contacts</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main" class="skip-to-main">Skip to main content</a>
+
+    <!-- Main App Container -->
+    <div class="app">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="app-header__title">Contacts</h1>
+            <div class="app-header__actions">
+                <button id="addContactBtn" class="btn btn--icon btn--primary" aria-label="Add new contact">
+                    <span style="font-size: 1.5rem; line-height: 1;">+</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <div class="search-bar__wrapper">
+                <span class="search-bar__icon">🔍</span>
+                <input type="search" id="searchInput" placeholder="Search contacts..." autocomplete="off"
+                    aria-label="Search contacts">
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main id="main" class="app-main">
+            <!-- Contact List -->
+            <div id="contactList" class="contact-list"></div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state hidden">
+                <div class="empty-state__icon">📇</div>
+                <h2 class="empty-state__title">No contacts found</h2>
+                <p class="empty-state__description">
+                    Tap the + button to add your first contact
+                </p>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+            <button class="bottom-nav__item active" data-view="all" aria-label="All contacts">
+                <span class="bottom-nav__icon">👥</span>
+                <span class="bottom-nav__label">All</span>
+            </button>
+            <button class="bottom-nav__item" data-view="favorites" aria-label="Favorite contacts">
+                <span class="bottom-nav__icon">⭐</span>
+                <span class="bottom-nav__label">Favorites</span>
+            </button>
+            <button class="bottom-nav__item" data-view="groups" aria-label="Contact groups">
+                <span class="bottom-nav__icon">📁</span>
+                <span class="bottom-nav__label">Groups</span>
+            </button>
+            <button class="bottom-nav__item" data-view="blocked" aria-label="Blocked contacts">
+                <span class="bottom-nav__icon">🚫</span>
+                <span class="bottom-nav__label">Blocked</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Modal Backdrop -->
+    <div id="modalBackdrop" class="modal-backdrop"></div>
+
+    <!-- Contact Detail Modal -->
+    <div id="detailModal" class="modal" role="dialog" aria-labelledby="detailModalTitle">
+        <div class="modal__handle"></div>
+        <div class="modal__header">
+            <h2 id="detailModalTitle" class="modal__title">Contact Details</h2>
+            <button class="btn btn--icon btn--ghost" onclick="UI.closeAllModals()" aria-label="Close">
+                ✕
+            </button>
+        </div>
+        <div class="modal__body">
+            <div class="contact-detail">
+                <!-- Header -->
+                <div class="contact-detail__header">
+                    <div id="detailAvatar" class="avatar avatar--lg contact-detail__avatar"></div>
+                    <h3 id="detailName" class="contact-detail__name"></h3>
+                    <p id="detailPhone" class="contact-detail__phone"></p>
+                    <div id="detailBadges" class="contact-detail__badges"></div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="contact-detail__actions">
+                    <button class="contact-detail__action" aria-label="Call contact">
+                        <span class="contact-detail__action-icon">📞</span>
+                        <span class="contact-detail__action-label">Call</span>
+                    </button>
+                    <button class="contact-detail__action" aria-label="Message contact">
+                        <span class="contact-detail__action-icon">💬</span>
+                        <span class="contact-detail__action-label">Message</span>
+                    </button>
+                    <button class="contact-detail__action" aria-label="Video call">
+                        <span class="contact-detail__action-icon">📹</span>
+                        <span class="contact-detail__action-label">Video</span>
+                    </button>
+                    <button class="contact-detail__action" aria-label="Email contact">
+                        <span class="contact-detail__action-icon">✉️</span>
+                        <span class="contact-detail__action-label">Email</span>
+                    </button>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="contact-detail__info">
+                    <div class="contact-detail__info-item">
+                        <span class="contact-detail__info-label">Phone</span>
+                        <span id="detailPhone" class="contact-detail__info-value"></span>
+                    </div>
+                    <div class="contact-detail__info-item">
+                        <span class="contact-detail__info-label">Email</span>
+                        <span id="detailEmail" class="contact-detail__info-value"></span>
+                    </div>
+                    <div class="contact-detail__info-item">
+                        <span class="contact-detail__info-label">Company</span>
+                        <span id="detailCompany" class="contact-detail__info-value"></span>
+                    </div>
+                    <div class="contact-detail__info-item">
+                        <span class="contact-detail__info-label">Notes</span>
+                        <span id="detailNotes" class="contact-detail__info-value"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal__footer">
+            <button id="favoriteBtn" class="btn btn--secondary btn--sm">☆ Add to Favorites</button>
+            <button id="blockBtn" class="btn btn--secondary btn--sm">🚫 Block</button>
+            <button id="editBtn" class="btn btn--primary btn--sm">Edit</button>
+            <button id="deleteBtn" class="btn btn--danger btn--sm">Delete</button>
+        </div>
+    </div>
+
+    <!-- Contact Form Modal -->
+    <div id="formModal" class="modal" role="dialog" aria-labelledby="formModalTitle">
+        <div class="modal__handle"></div>
+        <div class="modal__header">
+            <h2 id="formTitle" class="modal__title">New Contact</h2>
+            <button class="btn btn--icon btn--ghost" onclick="UI.closeAllModals()" aria-label="Close">
+                ✕
+            </button>
+        </div>
+        <div class="modal__body">
+            <form id="contactForm" class="contact-form">
+                <!-- Photo Upload -->
+                <div class="contact-form__avatar-upload">
+                    <div class="contact-form__avatar-preview">
+                        <div id="photoPreview" class="avatar avatar--lg">?</div>
+                        <label for="photoInput" class="contact-form__avatar-button" aria-label="Upload photo">
+                            📷
+                        </label>
+                        <input type="file" id="photoInput" class="contact-form__avatar-input" accept="image/*">
+                    </div>
+                </div>
+
+                <!-- Form Fields -->
+                <div class="input-group">
+                    <label for="firstNameInput" class="input-label">First Name *</label>
+                    <input type="text" id="firstNameInput" class="input" placeholder="John" required maxlength="50">
+                </div>
+
+                <div class="input-group">
+                    <label for="lastNameInput" class="input-label">Last Name</label>
+                    <input type="text" id="lastNameInput" class="input" placeholder="Doe" maxlength="50">
+                </div>
+
+                <div class="input-group">
+                    <label for="phoneInput" class="input-label">Phone *</label>
+                    <input type="tel" id="phoneInput" class="input" placeholder="+1 (555) 123-4567" required
+                        maxlength="20">
+                </div>
+
+                <div class="input-group">
+                    <label for="emailInput" class="input-label">Email</label>
+                    <input type="email" id="emailInput" class="input" placeholder="john.doe@example.com"
+                        maxlength="100">
+                </div>
+
+                <div class="input-group">
+                    <label for="companyInput" class="input-label">Company</label>
+                    <input type="text" id="companyInput" class="input" placeholder="Tech Corp" maxlength="100">
+                </div>
+
+                <div class="input-group">
+                    <label for="notesInput" class="input-label">Notes</label>
+                    <textarea id="notesInput" class="input" placeholder="Add notes..." maxlength="500"
+                        rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal__footer">
+            <button type="button" id="cancelBtn" class="btn btn--secondary">Cancel</button>
+            <button type="submit" form="contactForm" class="btn btn--primary">Save Contact</button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/contacts.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
